@@ -838,9 +838,9 @@
       </div>
     </div>
     <div class="nav-actions">
-      <button class="btn btn-outline" id="rotateBtnNav" onclick="toggleRotateCard(event)" title="Toggle Autorotate Mode">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l6.73-1.19"/></svg>
-        <span class="rotate-btn-text">Autorotate</span>
+      <button class="btn btn-outline" id="fullscreenBtnNav" onclick="toggleFullscreen(event)" title="Toggle Fullscreen">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        <span class="fs-btn-text">Fullscreen</span>
       </button>
       <button class="btn btn-outline" onclick="flipCard()">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
@@ -1053,7 +1053,7 @@
   <!-- Flip Instruction -->
   <div class="flip-hint">
     <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
-    <span>Tap card to flip • Always landscape format</span>
+    <span>Tap card to flip</span>
   </div>
 
   <!-- Floating Quick Action Dock -->
@@ -1062,9 +1062,9 @@
       <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
       <span>Flip Side</span>
     </button>
-    <button class="dock-btn" id="rotateBtnDock" onclick="toggleRotateCard(event)" title="Toggle 90° Landscape Orientation">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l6.73-1.19"/></svg>
-      <span class="rotate-btn-text">Autorotate</span>
+    <button class="dock-btn" id="fullscreenBtnDock" onclick="toggleFullscreen(event)" title="Toggle Fullscreen">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+      <span class="fs-btn-text">Fullscreen</span>
     </button>
     <a href="Ashish_Marsani.vcf" download="Ashish_Marsani.vcf" class="dock-btn">
       <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
@@ -1140,16 +1140,27 @@
       }
     }
 
-    function toggleRotateCard(e) {
+    function toggleFullscreen(e) {
       if (e) e.stopPropagation();
-      document.body.classList.toggle('rotate-90');
-      const isRotated = document.body.classList.contains('rotate-90');
-      const rotateBtnTexts = document.querySelectorAll('.rotate-btn-text');
-      rotateBtnTexts.forEach(el => {
-        el.textContent = isRotated ? 'Fit Screen' : 'Autorotate';
-      });
-      updateCardScale();
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          console.error(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
     }
+
+    document.addEventListener('fullscreenchange', () => {
+      const isFs = !!document.fullscreenElement;
+      const fsBtnTexts = document.querySelectorAll('.fs-btn-text');
+      fsBtnTexts.forEach(el => {
+        el.textContent = isFs ? 'Exit Fullscreen' : 'Fullscreen';
+      });
+      setTimeout(updateCardScale, 200);
+    });
 
     window.addEventListener('resize', updateCardScale);
     window.addEventListener('orientationchange', () => {
