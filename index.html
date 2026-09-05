@@ -7,8 +7,27 @@
   <meta name="description" content="Executive Virtual Card of Ashish Marsani — Principal System Architect specializing in Business & AI Systems, Serverless, Scalable Compute & Storage, and Risk Management.">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Ashish Marsani">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#f0f9ff">
+  
+  <!-- Open Graph / Social Meta Tags -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Ashish Marsani | Principal System Architect & Enterprise Advisor">
+  <meta property="og:description" content="Executive Virtual Card of Ashish Marsani — Principal System Architect specializing in Business & AI Systems, Serverless, Scalable Compute & Storage, and Risk Management.">
+  <meta property="og:image" content="Visiting_Card_Front.png">
+  <meta property="og:url" content="https://ashishmarsani.com.np">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Ashish Marsani | Principal System Architect & Enterprise Advisor">
+  <meta name="twitter:description" content="Executive Virtual Card of Ashish Marsani — Principal System Architect specializing in Business & AI Systems, Serverless, Scalable Compute & Storage, and Risk Management.">
+  <meta name="twitter:image" content="Visiting_Card_Front.png">
+  
+  <!-- Web App Manifest & Apple Touch Icon -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="Visiting_Card_Front.png">
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -409,7 +428,7 @@
     .pillars-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
+      gap: 16px;
       position: relative;
       z-index: 2;
     }
@@ -525,7 +544,7 @@
       object-fit: contain;
       z-index: 3;
       pointer-events: none;
-      filter: drop-shadow(0 1.5px 3px rgba(15, 23, 42, 0.16));
+      filter: drop-shadow(0 1px 2px rgba(15, 23, 42, 0.08));
     }
 
     .signature-line {
@@ -539,10 +558,10 @@
 
     .signature-label {
       font-family: 'Outfit', sans-serif;
-      font-size: 8.5px;
-      font-weight: 700;
-      letter-spacing: 1.8px;
-      color: #64748b;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #475569;
       text-transform: uppercase;
       text-align: center;
       position: relative;
@@ -714,6 +733,13 @@
       font-size: 12px;
       font-weight: 600;
       color: var(--text-light);
+      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s ease;
+    }
+
+    .flip-hint.faded {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(4px);
     }
 
     .flip-hint svg {
@@ -732,7 +758,24 @@
       z-index: 100;
     }
 
-.dock-btn:hover {
+    .dock-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      border: 1px solid rgba(203, 213, 225, 0.9);
+      background: #ffffff;
+      color: var(--text-dark);
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .dock-btn:hover {
       background: #f0f9ff;
       border-color: rgba(2, 132, 199, 0.3);
       transform: translateY(-2px);
@@ -901,11 +944,11 @@
 
   <!-- Action Buttons -->
   <div class="action-dock">
-    <button class="btn btn-outline" onclick="event.stopPropagation(); copyText('ashish.marsani@gmail.com', 'Email copied to clipboard')">
+    <button class="btn btn-outline" onclick="event.stopPropagation(); copyText('ashish.marsani@gmail.com', 'Email copied to clipboard', this)">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
       <span>Copy Email</span>
     </button>
-    <button class="btn btn-outline" onclick="event.stopPropagation(); copyText('+9779818750650', 'Phone copied to clipboard')">
+    <button class="btn btn-outline" onclick="event.stopPropagation(); copyText('+9779818750650', 'Phone copied to clipboard', this)">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-2.2 2.2a15.053 15.053 0 0 1-6.59-6.59l2.2-2.21a.96.96 0 0 0 .25-1.01A11.36 11.36 0 0 1 8.57 3.99c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.61c0-.55-.45-1-1-1z"/></svg>
       <span>Copy Phone</span>
     </button>
@@ -955,16 +998,28 @@
       }
     }
     
-    function copyText(text, msg) {
+    function copyText(text, msg, btn) {
       function showToastMsg(message) {
         const toast = document.getElementById('toast');
         const toastMsg = document.getElementById('toast-msg');
-        if(toast && toastMsg) {
-            toastMsg.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => {
-              toast.classList.remove('show');
-            }, 2400);
+        if (toast && toastMsg) {
+          toastMsg.textContent = message;
+          toast.classList.add('show');
+          setTimeout(() => {
+            toast.classList.remove('show');
+          }, 2400);
+        }
+      }
+
+      if (btn) {
+        const span = btn.querySelector('span');
+        if (span && !btn.dataset.originalText) {
+          btn.dataset.originalText = span.textContent;
+          span.textContent = '✓ Copied!';
+          setTimeout(() => {
+            span.textContent = btn.dataset.originalText;
+            delete btn.dataset.originalText;
+          }, 1600);
         }
       }
 
@@ -1016,6 +1071,17 @@
       
       if (!flipper || !visibleFace || !hiddenFace) return;
       
+      // Haptic feedback on supported mobile devices
+      if (navigator.vibrate) {
+        navigator.vibrate(40);
+      }
+
+      // Fade out the initial flip instruction hint
+      const hint = document.querySelector('.flip-hint');
+      if (hint) {
+        hint.classList.add('faded');
+      }
+
       flipCount++;
       const currentRotation = flipCount * 180;
       
@@ -1033,8 +1099,6 @@
       // When the card is exactly edge-on (invisible), swap the hidden face's content
       // The CSS transition is 0.65s, so edge-on is at ~0.325s (325ms)
       setTimeout(() => {
-        // Wait, at 325ms, the face that was visible is now facing away, and we should change ITS content to the *next* state, so it's ready for the next flip.
-        
         if (flipCount % 2 !== 0) {
           // hiddenFace becomes visible. We swap visibleFace's content for the next state.
           visibleFace.innerHTML = document.getElementById(templates[nextHiddenSide]).innerHTML;
@@ -1068,8 +1132,6 @@
 
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
-      const isLandscapeOrientation = window.matchMedia("(orientation: landscape)").matches;
-      const isRotatedLandscape = document.body.classList.contains('rotate-90');
 
       if (viewportWidth > 1080) {
         stage.style.width = '1050px';
@@ -1095,28 +1157,6 @@
         scene.style.transform = `scale(${scale})`;
       }
     }
-
-    function toggleFullscreen(e) {
-      if (e) e.stopPropagation();
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(err => {
-          console.error(`Error attempting to enable fullscreen: ${err.message}`);
-        });
-      } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        }
-      }
-    }
-
-    document.addEventListener('fullscreenchange', () => {
-      const isFs = !!document.fullscreenElement;
-      const fsBtnTexts = document.querySelectorAll('.fs-btn-text');
-      fsBtnTexts.forEach(el => {
-        el.textContent = isFs ? 'Exit Fullscreen' : 'Fullscreen';
-      });
-      setTimeout(updateCardScale, 200);
-    });
 
     window.addEventListener('resize', updateCardScale);
     window.addEventListener('orientationchange', () => {
@@ -1334,25 +1374,31 @@
 </template>
 
 <template id="template-actions">
-  <div class="front-layout" style="align-items: center; justify-content: center; height: 100%; display: flex; flex-direction: column; gap: 20px;">
-    <h3 style="font-family: 'Outfit', sans-serif; font-size: 24px; color: #0f172a; margin-bottom: 10px;">Actions</h3>
+  <div class="front-layout" style="align-items: center; justify-content: center; height: 100%; display: flex; flex-direction: column; gap: 16px;">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 4px;">
+      <div class="front-crest">AM</div>
+      <div style="display: flex; flex-direction: column;">
+        <div style="font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #0f172a;">QUICK ACTIONS</div>
+        <div style="font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #0284c7; margin-top: 1px;">CONNECT & SAVE CONTACT</div>
+      </div>
+    </div>
     
-    <a href="Ashish_Marsani.vcf" download="Ashish_Marsani.vcf" class="dock-btn" style="width: 80%; justify-content: center; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); border: none; color: #ffffff; padding: 14px 20px; border-radius: 14px; font-size: 16px; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25);" onclick="event.stopPropagation()">
+    <a href="Ashish_Marsani.vcf" download="Ashish_Marsani.vcf" class="dock-btn" style="width: 80%; justify-content: center; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); border: none; color: #ffffff; padding: 14px 20px; border-radius: 14px; font-size: 15px; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25);" onclick="event.stopPropagation()">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-      <span>Save Contact</span>
+      <span>Save Contact (.vcf)</span>
     </a>
     
-    <button class="dock-btn" style="width: 80%; justify-content: center; background: #f8fafc; border: 1px solid #cbd5e1; color: #0f172a;" onclick="event.stopPropagation(); copyText('ashish.marsani@gmail.com', 'Email copied to clipboard')">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-      <span style="font-size: 16px; font-weight: 600;">Copy Email</span>
+    <button class="dock-btn" style="width: 80%; justify-content: center; background: #ffffff; border: 1px solid #cbd5e1; color: #0f172a; padding: 14px 20px; border-radius: 14px; font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04); cursor: pointer;" onclick="event.stopPropagation(); copyText('ashish.marsani@gmail.com', 'Email copied to clipboard', this)">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="#0284c7"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+      <span>Copy Email</span>
     </button>
     
-    <button class="dock-btn" style="width: 80%; justify-content: center; background: #f8fafc; border: 1px solid #cbd5e1; color: #0f172a;" onclick="event.stopPropagation(); copyText('+9779818750650', 'Phone copied to clipboard')">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-2.2 2.2a15.053 15.053 0 0 1-6.59-6.59l2.2-2.21a.96.96 0 0 0 .25-1.01A11.36 11.36 0 0 1 8.57 3.99c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.61c0-.55-.45-1-1-1z"/></svg>
-      <span style="font-size: 16px; font-weight: 600;">Copy Phone</span>
+    <button class="dock-btn" style="width: 80%; justify-content: center; background: #ffffff; border: 1px solid #cbd5e1; color: #0f172a; padding: 14px 20px; border-radius: 14px; font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04); cursor: pointer;" onclick="event.stopPropagation(); copyText('+9779818750650', 'Phone copied to clipboard', this)">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="#0284c7"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-2.2 2.2a15.053 15.053 0 0 1-6.59-6.59l2.2-2.21a.96.96 0 0 0 .25-1.01A11.36 11.36 0 0 1 8.57 3.99c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.61c0-.55-.45-1-1-1z"/></svg>
+      <span>Copy Phone</span>
     </button>
     
-    <div id="iosActionPrompt" style="display: none; width: 80%; text-align: center; margin-top: 10px; font-size: 13px; color: #475569; background: rgba(2, 132, 199, 0.05); padding: 12px; border-radius: 12px; border: 1px dashed rgba(2, 132, 199, 0.2);">
+    <div id="iosActionPrompt" style="display: none; width: 80%; text-align: center; margin-top: 6px; font-size: 13px; color: #475569; background: rgba(2, 132, 199, 0.05); padding: 12px; border-radius: 12px; border: 1px dashed rgba(2, 132, 199, 0.2);">
       <strong>iPhone users:</strong> For the best experience, tap the <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin:0 2px;"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> <strong>Share</strong> button in Safari, then scroll down and tap <strong>Add to Home Screen</strong>.
     </div>
   </div>

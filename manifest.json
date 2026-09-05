@@ -1,0 +1,17 @@
+{
+  "name": "Ashish Marsani - Executive Virtual Card",
+  "short_name": "Ashish Marsani",
+  "description": "Executive Virtual Card of Ashish Marsani — Principal System Architect & Enterprise Advisor",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#0284c7",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "Visiting_Card_Front.png",
+      "sizes": "1050x600",
+      "type": "image/png"
+    }
+  ]
+}
