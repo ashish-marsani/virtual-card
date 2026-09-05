@@ -853,14 +853,22 @@
         padding: 0 !important;
         margin: 0 !important;
         overflow: hidden !important;
-        justify-content: flex-start !important;
+        justify-content: center !important;
+        align-items: center !important;
+        height: 100vh !important;
+        height: 100dvh !important;
       }
       .top-nav,
       .action-dock {
         display: none !important;
       }
       .card-stage {
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
         margin: 0 !important;
+        z-index: 10;
       }
     }
   </style>
@@ -1094,26 +1102,33 @@
       const viewportHeight = window.innerHeight;
 
       if (viewportWidth > 1080) {
+        // Desktop mode - normal layout
         stage.style.width = '1050px';
         stage.style.height = '600px';
         scene.style.transform = 'scale(1)';
         return;
       }
 
-      // Mobile Mode (<= 1080px)
+      // Mobile Mode (<= 1080px) — card is fixed vertically at viewport center
+      // Stage fills the viewport (position:fixed via CSS)
+      stage.style.width = viewportWidth + 'px';
+      stage.style.height = viewportHeight + 'px';
+
       const isPortrait = viewportHeight > viewportWidth;
 
       if (isPortrait) {
-        // Autorotate mode on mobile (portrait): fit both width and height
-        const scale = Math.min(viewportHeight / 1050, viewportWidth / 600);
-        stage.style.width = Math.round(600 * scale) + 'px';
-        stage.style.height = Math.round(1050 * scale) + 'px';
+        // Portrait: card auto-rotates to landscape orientation
+        // Card is 1050x600 but we rotate it 90°, so it effectively needs
+        // 600px width and 1050px height — then we scale to fit the viewport
+        const scaleW = viewportWidth / 600;   // fit rotated width
+        const scaleH = viewportHeight / 1050; // fit rotated height
+        const scale = Math.min(scaleW, scaleH) * 0.92; // 8% padding for visual breathing room
         scene.style.transform = `rotate(90deg) scale(${scale})`;
       } else {
-        // Normal mode on mobile (landscape): fit both width and height
-        const scale = Math.min(viewportWidth / 1050, viewportHeight / 600);
-        stage.style.width = Math.round(1050 * scale) + 'px';
-        stage.style.height = Math.round(600 * scale) + 'px';
+        // Landscape: card sits naturally, scale to fit viewport
+        const scaleW = viewportWidth / 1050;
+        const scaleH = viewportHeight / 600;
+        const scale = Math.min(scaleW, scaleH) * 0.92;
         scene.style.transform = `scale(${scale})`;
       }
     }
