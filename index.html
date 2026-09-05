@@ -1110,6 +1110,13 @@
       if (flipper) {
         flipper.classList.toggle('flipped');
       }
+      
+      // Attempt to enter fullscreen on mobile devices when tapping the card (Android Chrome supports this)
+      if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(err => {
+          // Silently ignore errors (e.g. if browser blocks it or iOS Safari where it's not supported)
+        });
+      }
     }
 
     // Dynamic responsive card scaling and landscape orientation
