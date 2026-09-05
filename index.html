@@ -1082,8 +1082,8 @@
       const isPortrait = viewportHeight > viewportWidth;
 
       if (isPortrait) {
-        // Autorotate mode on mobile (portrait): Rotated 90 degrees, zoomed out slightly
-        const scale = (viewportHeight * 0.9) / 1050;
+        // Autorotate mode on mobile (portrait): Rotated 90 degrees to fill screen height
+        const scale = viewportHeight / 1050;
         stage.style.width = Math.round(600 * scale) + 'px';
         stage.style.height = Math.round(1050 * scale) + 'px';
         scene.style.transform = `rotate(90deg) scale(${scale})`;
