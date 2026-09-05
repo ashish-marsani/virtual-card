@@ -800,32 +800,17 @@
     /* Responsive scaling & landscape presentation for mobile devices */
     @media (max-width: 1080px) {
       body {
-        padding: 18px 12px 90px;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+        justify-content: center !important;
       }
-      .top-nav {
-        flex-direction: column;
-        gap: 12px;
-        margin-bottom: 16px;
-      }
-      .nav-actions {
-        width: 100%;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
+      .top-nav,
       .action-dock {
-        bottom: 12px;
-        padding: 6px 10px;
-        gap: 6px;
-        max-width: calc(100vw - 20px);
-        overflow-x: auto;
+        display: none !important;
       }
-      .dock-btn span {
-        display: none;
-      }
-      .dock-btn.primary span,
-      .dock-btn .rotate-btn-text {
-        display: inline;
+      .card-stage {
+        margin: 0 !important;
       }
     }
 
@@ -853,9 +838,9 @@
       </div>
     </div>
     <div class="nav-actions">
-      <button class="btn btn-outline" id="rotateBtnNav" onclick="toggleRotateCard(event)" title="Toggle 90° Full Landscape Mode">
+      <button class="btn btn-outline" id="rotateBtnNav" onclick="toggleRotateCard(event)" title="Toggle Autorotate Mode">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l6.73-1.19"/></svg>
-        <span class="rotate-btn-text">Full Landscape</span>
+        <span class="rotate-btn-text">Autorotate</span>
       </button>
       <button class="btn btn-outline" onclick="flipCard()">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
@@ -1079,7 +1064,7 @@
     </button>
     <button class="dock-btn" id="rotateBtnDock" onclick="toggleRotateCard(event)" title="Toggle 90° Landscape Orientation">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l6.73-1.19"/></svg>
-      <span class="rotate-btn-text">Full Landscape</span>
+      <span class="rotate-btn-text">Autorotate</span>
     </button>
     <a href="Ashish_Marsani.vcf" download="Ashish_Marsani.vcf" class="dock-btn">
       <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
@@ -1130,36 +1115,23 @@
       const isLandscapeOrientation = window.matchMedia("(orientation: landscape)").matches;
       const isRotatedLandscape = document.body.classList.contains('rotate-90');
 
-      if (viewportWidth > 1080 && !isRotatedLandscape) {
+      if (viewportWidth > 1080) {
         stage.style.width = '1050px';
         stage.style.height = '600px';
         scene.style.transform = 'scale(1)';
         return;
       }
 
+      // Mobile Mode (<= 1080px)
       if (isRotatedLandscape) {
-        // Full landscape mode on mobile: Rotated 90 degrees to fill screen height
-        const availHeight = Math.min(viewportHeight - 160, 950);
-        const availWidth = Math.min(viewportWidth - 24, 600);
-        const scale = Math.min(availHeight / 1050, availWidth / 600, 0.95);
-
+        // Autorotate mode on mobile (portrait): Rotated 90 degrees to fill screen
+        const scale = Math.min(viewportHeight / 1050, viewportWidth / 600);
         stage.style.width = '100%';
         stage.style.height = Math.round(1050 * scale) + 'px';
         scene.style.transform = `rotate(90deg) scale(${scale})`;
-      } else if (isLandscapeOrientation && viewportHeight < 720) {
-        // Physical phone held horizontally in landscape
-        const availWidth = viewportWidth - 32;
-        const availHeight = viewportHeight - 90;
-        const scale = Math.min(availWidth / 1050, availHeight / 600, 1);
-
-        stage.style.width = Math.round(1050 * scale) + 'px';
-        stage.style.height = Math.round(600 * scale) + 'px';
-        scene.style.transform = `scale(${scale})`;
       } else {
-        // Mobile held in portrait: fits screen width in exact 1.75:1 landscape ratio
-        const availWidth = Math.min(viewportWidth - 24, 1050);
-        const scale = availWidth / 1050;
-
+        // Normal mode on mobile (landscape or fit to screen)
+        const scale = Math.min(viewportWidth / 1050, viewportHeight / 600);
         stage.style.width = Math.round(1050 * scale) + 'px';
         stage.style.height = Math.round(600 * scale) + 'px';
         scene.style.transform = `scale(${scale})`;
@@ -1172,7 +1144,7 @@
       const isRotated = document.body.classList.contains('rotate-90');
       const rotateBtnTexts = document.querySelectorAll('.rotate-btn-text');
       rotateBtnTexts.forEach(el => {
-        el.textContent = isRotated ? 'Fit Screen' : 'Full Landscape (90°)';
+        el.textContent = isRotated ? 'Fit Screen' : 'Autorotate';
       });
       updateCardScale();
     }
@@ -1181,7 +1153,16 @@
     window.addEventListener('orientationchange', () => {
       setTimeout(updateCardScale, 150);
     });
-    document.addEventListener('DOMContentLoaded', updateCardScale);
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.innerWidth <= 1080 && !window.matchMedia("(orientation: landscape)").matches) {
+        document.body.classList.add('rotate-90');
+        const rotateBtnTexts = document.querySelectorAll('.rotate-btn-text');
+        rotateBtnTexts.forEach(el => {
+          el.textContent = 'Fit Screen';
+        });
+      }
+      updateCardScale();
+    });
     setTimeout(updateCardScale, 200);
 
     // Keyboard support: Space or Enter flips
