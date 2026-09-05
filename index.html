@@ -805,6 +805,53 @@
       transform: translateX(-50%) translateY(0);
     }
 
+    /* iOS Fullscreen Prompt */
+    .ios-prompt {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.95);
+      color: white;
+      padding: 14px 16px;
+      border-radius: 16px;
+      font-size: 14px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+      z-index: 1000;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      width: calc(100% - 32px);
+      max-width: 350px;
+      text-align: left;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    @keyframes slideUpFade {
+      from { transform: translate(-50%, 30px); opacity: 0; }
+      to { transform: translate(-50%, 0); opacity: 1; }
+    }
+    
+    .ios-prompt-content {
+      flex: 1;
+      line-height: 1.4;
+    }
+    
+    .ios-prompt-close {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.6);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     /* Responsive scaling & landscape presentation for mobile devices */
     @media (max-width: 1080px) {
       body {
@@ -834,6 +881,14 @@
   <div id="toast" class="toast">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="#38bdf8"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
     <span id="toast-msg">Action Successful</span>
+  </div>
+
+  <!-- iOS Fullscreen Prompt -->
+  <div id="iosPrompt" class="ios-prompt">
+    <div class="ios-prompt-content">
+      To <strong>View Fullscreen</strong>, tap <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin:0 4px;"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> below and select <strong>Add to Home Screen</strong>.
+    </div>
+    <button class="ios-prompt-close" onclick="document.getElementById('iosPrompt').style.display='none'">✕</button>
   </div>
 
   <!-- Top Navigation -->
@@ -1182,6 +1237,12 @@
       setTimeout(updateCardScale, 150);
     });
     document.addEventListener('DOMContentLoaded', () => {
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+      if (isIOS && !isStandalone) {
+        document.getElementById('iosPrompt').style.display = 'flex';
+      }
+      
       updateCardScale();
     });
     setTimeout(updateCardScale, 200);
