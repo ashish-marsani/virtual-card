@@ -1110,22 +1110,32 @@
       }
 
       // Mobile Mode (<= 1080px) — card is fixed vertically at viewport center
-      // Stage fills the viewport (position:fixed via CSS)
       stage.style.width = viewportWidth + 'px';
       stage.style.height = viewportHeight + 'px';
 
-      const isPortrait = viewportHeight > viewportWidth;
+      // Detect orientation using multiple signals for maximum reliability
+      // screen.orientation works on Android + modern iOS; fallback to viewport ratio
+      let isPortrait = viewportHeight > viewportWidth;
+
+      // Double-check with screen.orientation API if available (handles edge cases)
+      if (screen.orientation && screen.orientation.type) {
+        const orientationType = screen.orientation.type;
+        if (orientationType.startsWith('landscape')) {
+          isPortrait = false;
+        } else if (orientationType.startsWith('portrait')) {
+          isPortrait = true;
+        }
+      }
 
       if (isPortrait) {
         // Portrait: card auto-rotates to landscape orientation
-        // Card is 1050x600 but we rotate it 90°, so it effectively needs
-        // 600px width and 1050px height — then we scale to fit the viewport
-        const scaleW = viewportWidth / 600;   // fit rotated width
-        const scaleH = viewportHeight / 1050; // fit rotated height
-        const scale = Math.min(scaleW, scaleH) * 0.92; // 8% padding for visual breathing room
+        // Card is 1050×600, rotated 90° → needs 600px width, 1050px height
+        const scaleW = viewportWidth / 600;
+        const scaleH = viewportHeight / 1050;
+        const scale = Math.min(scaleW, scaleH) * 0.92;
         scene.style.transform = `rotate(90deg) scale(${scale})`;
       } else {
-        // Landscape: card sits naturally, scale to fit viewport
+        // Landscape (either direction): card sits naturally, no rotation needed
         const scaleW = viewportWidth / 1050;
         const scaleH = viewportHeight / 600;
         const scale = Math.min(scaleW, scaleH) * 0.92;
@@ -1133,10 +1143,27 @@
       }
     }
 
-    window.addEventListener('resize', updateCardScale);
-    window.addEventListener('orientationchange', () => {
+    // Staggered retries after orientation change to handle iOS viewport settle delay
+    function handleOrientationChange() {
+      updateCardScale();
       setTimeout(updateCardScale, 150);
-    });
+      setTimeout(updateCardScale, 400);
+      setTimeout(updateCardScale, 800);
+    }
+
+    // Listen to all orientation signals for maximum coverage
+    window.addEventListener('resize', updateCardScale);
+    window.addEventListener('orientationchange', handleOrientationChange);
+
+    // Modern screen.orientation API (fires for landscape-primary AND landscape-secondary)
+    if (screen.orientation) {
+      screen.orientation.addEventListener('change', handleOrientationChange);
+    }
+
+    // MediaQuery listener as additional fallback (catches all orientation changes)
+    const portraitMQ = window.matchMedia('(orientation: portrait)');
+    portraitMQ.addEventListener('change', handleOrientationChange);
+
     document.addEventListener('DOMContentLoaded', () => {
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
       const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
