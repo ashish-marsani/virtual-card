@@ -802,7 +802,7 @@
       body {
         padding: 0 !important;
         margin: 0 !important;
-        overflow: hidden !important;
+        overflow: auto !important;
         justify-content: center !important;
       }
       .top-nav,
@@ -1127,13 +1127,13 @@
 
       if (isPortrait) {
         // Autorotate mode on mobile (portrait): Rotated 90 degrees to fill screen
-        const scale = Math.min(viewportHeight / 1050, viewportWidth / 600);
-        stage.style.width = '100%';
+        const scale = Math.min(viewportHeight / 1050, viewportWidth / 600) * 1.15;
+        stage.style.width = Math.round(600 * scale) + 'px';
         stage.style.height = Math.round(1050 * scale) + 'px';
         scene.style.transform = `rotate(90deg) scale(${scale})`;
       } else {
         // Normal mode on mobile (landscape or fit to screen)
-        const scale = Math.min(viewportWidth / 1050, viewportHeight / 600);
+        const scale = Math.min(viewportWidth / 1050, viewportHeight / 600) * 1.15;
         stage.style.width = Math.round(1050 * scale) + 'px';
         stage.style.height = Math.round(600 * scale) + 'px';
         scene.style.transform = `scale(${scale})`;
