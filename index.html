@@ -1093,7 +1093,10 @@
         
         scene.style.width = CARD_WIDTH + 'px';
         scene.style.height = CARD_HEIGHT + 'px';
-        scene.style.transform = `rotate(90deg) scale(${scale})`;
+        scene.style.position = 'absolute';
+        scene.style.top = '50%';
+        scene.style.left = '50%';
+        scene.style.transform = `translate(-50%, -50%) rotate(90deg) scale(${scale})`;
       } else {
         const scale = (viewportWidth * 0.9) / CARD_WIDTH;
         stage.style.width = Math.round(CARD_WIDTH * scale) + 'px';
@@ -1101,7 +1104,10 @@
         
         scene.style.width = CARD_WIDTH + 'px';
         scene.style.height = CARD_HEIGHT + 'px';
-        scene.style.transform = `scale(${scale})`;
+        scene.style.position = 'absolute';
+        scene.style.top = '50%';
+        scene.style.left = '50%';
+        scene.style.transform = `translate(-50%, -50%) scale(${scale})`;
       }
     }
 
