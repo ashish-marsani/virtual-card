@@ -993,29 +993,46 @@
       }
     }
     
-    function copyText(text, successMessage) {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
+    function copyText(text, msg) {
+      function showToastMsg(message) {
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toast-msg');
+        if(toast && toastMsg) {
+            toastMsg.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+              toast.classList.remove('show');
+            }, 2400);
+        }
+      }
+
+      if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(text).then(() => {
-          showToast(successMessage);
+          showToastMsg(msg);
         }).catch(err => {
-          console.error('Failed to copy: ', err);
+          fallbackCopyText(text, msg, showToastMsg);
         });
       } else {
-        // Fallback for older browsers
-        const textArea = document.createElement("textarea");
-        textArea.value = text;
-        textArea.style.position = "fixed";
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        try {
-          document.execCommand('copy');
-          showToast(successMessage);
-        } catch (err) {
-          console.error('Fallback: Oops, unable to copy', err);
-        }
-        document.body.removeChild(textArea);
+        fallbackCopyText(text, msg, showToastMsg);
       }
+    }
+
+    function fallbackCopyText(text, msg, showToastMsg) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.left = "-999999px";
+      textArea.style.top = "-999999px";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        showToastMsg(msg);
+      } catch (err) {
+        console.error('Fallback: Oops, unable to copy', err);
+      }
+      document.body.removeChild(textArea);
     }
 
     function checkIosPrompt() {
@@ -1068,10 +1085,10 @@
       }, 325);
       
       // Attempt to enter fullscreen on mobile devices when tapping the card (Android Chrome supports this)
-      if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen().catch(err => {
-          // Silently ignore errors (e.g. if browser blocks it or iOS Safari where it's not supported)
-        });
+      if (window.innerWidth <= 1080 && /Mobi|Android/i.test(navigator.userAgent)) {
+        if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen().catch(err => {});
+        }
       }
     }
 
@@ -1160,17 +1177,7 @@
     });
 
     // Toast notification
-    function copyText(text, msg) {
-      navigator.clipboard.writeText(text).then(() => {
-        const toast = document.getElementById('toast');
-        const toastMsg = document.getElementById('toast-msg');
-        toastMsg.textContent = msg;
-        toast.classList.add('show');
-        setTimeout(() => {
-          toast.classList.remove('show');
-        }, 2400);
-      });
-    }
+
   </script>
 <template id="template-front">
 <div class="front-layout">
@@ -1381,7 +1388,7 @@
     </button>
     
     <div id="iosActionPrompt" style="display: none; width: 80%; text-align: center; margin-top: 10px; font-size: 14px; color: #475569; background: rgba(2, 132, 199, 0.05); padding: 12px; border-radius: 12px; border: 1px dashed rgba(2, 132, 199, 0.2);">
-      To <strong>View Fullscreen</strong>, tap <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin:0 2px;"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> in your browser and select <strong>Add to Home Screen</strong>.
+      To <strong>View Fullscreen</strong>, tap the <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin:0 2px;"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> <strong>Share</strong> icon (usually at the top right or bottom of your browser) and scroll down to select <strong>Add to Home Screen</strong>.
     </div>
   </div>
 </template>
