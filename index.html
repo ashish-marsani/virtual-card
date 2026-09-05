@@ -1088,8 +1088,8 @@
         stage.style.height = Math.round(1050 * scale) + 'px';
         scene.style.transform = `rotate(90deg) scale(${scale})`;
       } else {
-        // Normal mode on mobile (landscape): fill screen width
-        const scale = viewportWidth / 1050;
+        // Normal mode on mobile (landscape): fit both width and height
+        const scale = Math.min(viewportWidth / 1050, viewportHeight / 600);
         stage.style.width = Math.round(1050 * scale) + 'px';
         stage.style.height = Math.round(600 * scale) + 'px';
         scene.style.transform = `scale(${scale})`;
