@@ -1068,39 +1068,30 @@
 
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
+      const isLandscapeOrientation = window.matchMedia("(orientation: landscape)").matches;
+      const isRotatedLandscape = document.body.classList.contains('rotate-90');
 
       if (viewportWidth > 1080) {
         stage.style.width = '1050px';
         stage.style.height = '600px';
-        scene.style.width = '100%';
-        scene.style.height = '100%';
         scene.style.transform = 'scale(1)';
         return;
       }
 
       // Mobile Mode (<= 1080px)
-      // Shorter length (950) to match real credit card aspect ratio (950/600 ~ 1.58)
-      const CARD_WIDTH = 1050;
-      const CARD_HEIGHT = 600;
-      
       const isPortrait = viewportHeight > viewportWidth;
 
       if (isPortrait) {
-        // Scale to 50% of viewport height for testing
-        const scale = (viewportHeight * 0.5) / CARD_WIDTH;
-        stage.style.width = Math.round(CARD_HEIGHT * scale) + 'px';
-        stage.style.height = Math.round(CARD_WIDTH * scale) + 'px';
-        
-        scene.style.width = CARD_WIDTH + 'px';
-        scene.style.height = CARD_HEIGHT + 'px';
+        // Autorotate mode on mobile (portrait): Rotated 90 degrees to fill screen height
+        const scale = viewportHeight / 1050;
+        stage.style.width = Math.round(600 * scale) + 'px';
+        stage.style.height = Math.round(1050 * scale) + 'px';
         scene.style.transform = `rotate(90deg) scale(${scale})`;
       } else {
-        const scale = (viewportWidth * 0.9) / CARD_WIDTH;
-        stage.style.width = Math.round(CARD_WIDTH * scale) + 'px';
-        stage.style.height = Math.round(CARD_HEIGHT * scale) + 'px';
-        
-        scene.style.width = CARD_WIDTH + 'px';
-        scene.style.height = CARD_HEIGHT + 'px';
+        // Normal mode on mobile (landscape): fill screen width
+        const scale = viewportWidth / 1050;
+        stage.style.width = Math.round(1050 * scale) + 'px';
+        stage.style.height = Math.round(600 * scale) + 'px';
         scene.style.transform = `scale(${scale})`;
       }
     }
