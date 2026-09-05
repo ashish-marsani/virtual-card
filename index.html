@@ -1061,9 +1061,12 @@
       flipper.style.transform = `rotateY(${currentRotation}deg)`;
       flipper.style.webkitTransform = `rotateY(${currentRotation}deg)`;
       
+      // Determine max sides based on viewport
+      const maxSides = (window.innerWidth <= 1080) ? 3 : 2;
+      
       // Update state
-      currentSide = currentSide === 3 ? 1 : currentSide + 1;
-      const nextHiddenSide = currentSide === 3 ? 1 : currentSide + 1;
+      currentSide = (currentSide >= maxSides) ? 1 : currentSide + 1;
+      const nextHiddenSide = (currentSide >= maxSides) ? 1 : currentSide + 1;
       
       // When the card is exactly edge-on (invisible), swap the hidden face's content
       // The CSS transition is 0.65s, so edge-on is at ~0.325s (325ms)
