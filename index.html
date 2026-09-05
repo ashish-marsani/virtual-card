@@ -1086,14 +1086,13 @@
       const isPortrait = viewportHeight > viewportWidth;
 
       if (isPortrait) {
-        // Scale to 85% of viewport height so card fits without scrolling
-        const scale = (viewportHeight * 0.85) / CARD_WIDTH;
+        // Scale to 75% of viewport height so entire card fits without scrolling
+        const scale = (viewportHeight * 0.75) / CARD_WIDTH;
         stage.style.width = Math.round(CARD_HEIGHT * scale) + 'px';
         stage.style.height = Math.round(CARD_WIDTH * scale) + 'px';
         
         scene.style.width = CARD_WIDTH + 'px';
         scene.style.height = CARD_HEIGHT + 'px';
-        scene.style.transformOrigin = 'center top';
         scene.style.transform = `rotate(90deg) scale(${scale})`;
       } else {
         const scale = (viewportWidth * 0.9) / CARD_WIDTH;
