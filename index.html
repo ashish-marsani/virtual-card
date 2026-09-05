@@ -1123,7 +1123,9 @@
       }
 
       // Mobile Mode (<= 1080px)
-      if (isRotatedLandscape) {
+      const isPortrait = viewportHeight > viewportWidth;
+
+      if (isPortrait) {
         // Autorotate mode on mobile (portrait): Rotated 90 degrees to fill screen
         const scale = Math.min(viewportHeight / 1050, viewportWidth / 600);
         stage.style.width = '100%';
@@ -1154,13 +1156,6 @@
       setTimeout(updateCardScale, 150);
     });
     document.addEventListener('DOMContentLoaded', () => {
-      if (window.innerWidth <= 1080 && !window.matchMedia("(orientation: landscape)").matches) {
-        document.body.classList.add('rotate-90');
-        const rotateBtnTexts = document.querySelectorAll('.rotate-btn-text');
-        rotateBtnTexts.forEach(el => {
-          el.textContent = 'Fit Screen';
-        });
-      }
       updateCardScale();
     });
     setTimeout(updateCardScale, 200);
