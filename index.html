@@ -1086,8 +1086,8 @@
       const isPortrait = viewportHeight > viewportWidth;
 
       if (isPortrait) {
-        // Scale to 75% of viewport height so entire card fits without scrolling
-        const scale = (viewportHeight * 0.75) / CARD_WIDTH;
+        // Scale to 50% of viewport height for testing
+        const scale = (viewportHeight * 0.5) / CARD_WIDTH;
         stage.style.width = Math.round(CARD_HEIGHT * scale) + 'px';
         stage.style.height = Math.round(CARD_WIDTH * scale) + 'px';
         
