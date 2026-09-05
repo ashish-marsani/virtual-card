@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Ashish Marsani | Principal System Architect & Enterprise Advisor</title>
   <meta name="description" content="Executive Virtual Card of Ashish Marsani — Principal System Architect specializing in Business & AI Systems, Serverless, Scalable Compute & Storage, and Risk Management.">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1113,33 +1116,35 @@
       stage.style.width = viewportWidth + 'px';
       stage.style.height = viewportHeight + 'px';
 
-      // Check all landscape signals
-      const isRatioLandscape = viewportWidth > viewportHeight;
-      const isMQLandscape = window.matchMedia && window.matchMedia('(orientation: landscape)').matches;
-      const winOrient = typeof window.orientation !== 'undefined' ? window.orientation : null;
-      const isWinLandscape = (winOrient === 90 || winOrient === -90 || winOrient === 270);
-      const isScreenLandscape = screen.orientation && screen.orientation.type && screen.orientation.type.startsWith('landscape');
+      // Device physical orientation angle
+      let orientAngle = 0;
+      if (typeof window.orientation !== 'undefined' && window.orientation !== null) {
+        orientAngle = Number(window.orientation);
+      } else if (screen.orientation && typeof screen.orientation.angle !== 'undefined') {
+        orientAngle = Number(screen.orientation.angle);
+      }
 
-      // If ANY robust landscape signal is true, it is landscape!
-      const isLandscape = isRatioLandscape || isMQLandscape || isWinLandscape || isScreenLandscape;
+      // Check if browser viewport is in landscape (width > height)
+      const isViewportLandscape = (viewportWidth > viewportHeight) || (window.matchMedia && window.matchMedia('(orientation: landscape)').matches);
 
-      if (isLandscape) {
-        // Landscape (either landscape-left or landscape-right):
-        // Card displays naturally, no 90° rotation needed
+      if (isViewportLandscape) {
+        // Browser viewport has rotated into landscape (both landscape-left and landscape-right)
         const scaleW = viewportWidth / 1050;
         const scaleH = viewportHeight / 600;
         const scale = Math.min(scaleW, scaleH) * 0.92;
         scene.style.transform = `scale(${scale})`;
       } else {
-        // Portrait: card auto-rotates to fit phone screen horizontally
+        // Browser viewport is in portrait (viewportHeight >= viewportWidth)
+        // Card is scaled to fit phone screen
         const scaleW = viewportWidth / 600;
         const scaleH = viewportHeight / 1050;
         const scale = Math.min(scaleW, scaleH) * 0.92;
 
-        // If physically held in landscape-right (-90° / 270°) but browser viewport stayed in portrait
-        if (winOrient === -90 || winOrient === 270 || (screen.orientation && screen.orientation.type === 'landscape-secondary')) {
+        // When tilted to landscape-right (-90° / 270°), rotate -90° so it stays right-side up!
+        if (orientAngle === -90 || orientAngle === 270 || (screen.orientation && screen.orientation.type === 'landscape-secondary')) {
           scene.style.transform = `rotate(-90deg) scale(${scale})`;
         } else {
+          // Normal portrait (0°) or landscape-left (90°)
           scene.style.transform = `rotate(90deg) scale(${scale})`;
         }
       }
