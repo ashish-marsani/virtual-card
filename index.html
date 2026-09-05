@@ -941,10 +941,10 @@
   <!-- Top Navigation -->
   <header class="top-nav">
     <div class="nav-brand">
-      <div class="nav-crest">AM</div>
+      <div class="nav-crest card-crest">AM</div>
       <div class="nav-title-block">
-        <div class="nav-name">ARCHITECTURE & ADVISORY</div>
-        <div class="nav-role">ENTERPRISE CLOUD & AI SYSTEMS</div>
+        <div class="nav-name card-company-name">ARCHITECTURE & ADVISORY</div>
+        <div class="nav-role card-role-subtitle">ENTERPRISE CLOUD & AI SYSTEMS</div>
       </div>
     </div>
     <div class="nav-actions">
@@ -953,7 +953,7 @@
         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
         <span>Flip Side</span>
       </button>
-      <a href="Ashish_Marsani.vcf" download="Ashish_Marsani.vcf" class="btn btn-sky">
+      <a href="Ashish_Marsani.vcf" download="Ashish_Marsani.vcf" class="btn btn-sky card-vcf-btn">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
         <span>Save to Contacts (.vcf)</span>
       </a>
@@ -974,11 +974,11 @@
 
   <!-- Action Buttons -->
   <div class="action-dock">
-    <button class="btn btn-outline" onclick="event.stopPropagation(); copyText('ashish.marsani@gmail.com', 'Email copied to clipboard', this)">
+    <button class="btn btn-outline card-email-btn" onclick="event.stopPropagation(); copyText('ashish.marsani@gmail.com', 'Email copied to clipboard', this)">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
       <span>Copy Email</span>
     </button>
-    <button class="btn btn-outline" onclick="event.stopPropagation(); copyText('+9779818750650', 'Phone copied to clipboard', this)">
+    <button class="btn btn-outline card-phone-btn" onclick="event.stopPropagation(); copyText('+9779818750650', 'Phone copied to clipboard', this)">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-2.2 2.2a15.053 15.053 0 0 1-6.59-6.59l2.2-2.21a.96.96 0 0 0 .25-1.01A11.36 11.36 0 0 1 8.57 3.99c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1 0 9.39 7.61 17 17 17 .55 0 1-.45 1-1v-3.61c0-.55-.45-1-1-1z"/></svg>
       <span>Copy Phone</span>
     </button>
@@ -990,6 +990,325 @@
   </script>
 
   <script>
+    // ==========================================
+    // SUPABASE MULTI-TENANT SAAS ENGINE
+    // ==========================================
+    const SUPABASE_CONFIG = {
+      url: 'https://frvjnvfhuiiwlqshlwnv.supabase.co',
+      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZydmpudmZodWlpd2xxc2hsd252Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2Mzk4NTcsImV4cCI6MjEwNDIxNTg1N30.-kMNN3_7qBX69nPaPOpFqKbdcA8YZrQhvVsOgYtM6Nc'
+    };
+
+    let activeCard = null;
+
+    // Detect target slug from query parameter (?card= or ?u=) or URL path (/elena)
+    function resolveCardSlug() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const querySlug = params.get('card') || params.get('u') || params.get('slug');
+        if (querySlug) return querySlug.trim().toLowerCase();
+
+        const pathSegments = window.location.pathname.replace(/^\/+|\/+$/g, '').split('/');
+        const first = pathSegments[0] ? pathSegments[0].trim().toLowerCase() : '';
+        const ignored = ['', 'index.html', 'index', 'favicon.ico', 'robots.txt', 'manifest.json', 'security.txt'];
+        if (first && !ignored.includes(first) && !first.includes('.')) {
+          return first;
+        }
+      } catch (e) {
+        console.warn('Error resolving slug:', e);
+      }
+      return 'ashish';
+    }
+
+    // Dynamic vCard (.vcf) Generator
+    function updateVCard(card) {
+      if (!card || !card.full_name) return;
+      const names = card.full_name.trim().split(/\s+/);
+      const firstName = names[0] || '';
+      const lastName = names.slice(1).join(' ') || '';
+      const vcardText = [
+        'BEGIN:VCARD',
+        'VERSION:3.0',
+        `FN:${card.full_name}`,
+        `N:${lastName};${firstName};;;`,
+        `ORG:${card.company_name || ''}`,
+        `TITLE:${card.headline_title || card.role_subtitle || ''}`,
+        `EMAIL;TYPE=INTERNET,WORK:${card.email || ''}`,
+        `TEL;TYPE=CELL,VOICE:${card.phone || ''}`,
+        `URL:${card.website || window.location.href}`,
+        `ADR;TYPE=WORK:;;${card.location || ''};;;;`,
+        `NOTE:${(card.bio || '').replace(/\r?\n/g, ' ')}`,
+        'END:VCARD'
+      ].join('\r\n');
+
+      const blob = new Blob([vcardText], { type: 'text/vcard;charset=utf-8;' });
+      const blobUrl = URL.createObjectURL(blob);
+      const filename = `${card.full_name.replace(/[^a-zA-Z0-9_-]/g, '_')}.vcf`;
+
+      document.querySelectorAll('a[href$=".vcf"], a[download$=".vcf"]').forEach(link => {
+        link.href = blobUrl;
+        link.download = filename;
+      });
+    }
+
+    // Dynamic QR Code Generator for Current Card
+    function initQRCode() {
+      const qrContainer = document.getElementById("qrcode");
+      if (qrContainer) {
+        qrContainer.innerHTML = '';
+        const currentUrl = window.location.href;
+        new QRCode(qrContainer, {
+          text: currentUrl,
+          width: 172,
+          height: 172,
+          colorDark: "#0f172a",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.H
+        });
+      }
+    }
+
+    // Hydrate any DOM container with card data
+    function hydrateContainer(root, card) {
+      if (!root || !card) return;
+
+      // Crests
+      if (card.crest_initials) {
+        root.querySelectorAll('.card-crest, .front-crest').forEach(el => el.textContent = card.crest_initials);
+      }
+
+      // Company & Subtitle
+      if (card.company_name) {
+        root.querySelectorAll('.card-company-name').forEach(el => el.textContent = card.company_name);
+      }
+      if (card.role_subtitle) {
+        root.querySelectorAll('.card-role-subtitle').forEach(el => el.textContent = card.role_subtitle);
+      }
+
+      // Badge Text
+      if (card.badge_text) {
+        root.querySelectorAll('.card-badge-text').forEach(el => el.textContent = card.badge_text);
+      }
+
+      // Names & Titles
+      if (card.full_name) {
+        root.querySelectorAll('.person-name, .back-title').forEach(el => el.textContent = card.full_name);
+      }
+      if (card.headline_title) {
+        root.querySelectorAll('.person-title').forEach(el => el.textContent = card.headline_title);
+      }
+      if (card.headline_title || card.company_name) {
+        root.querySelectorAll('.back-sub').forEach(el => el.textContent = card.headline_title || card.company_name);
+      }
+
+      // Bio / Summary
+      if (card.bio) {
+        root.querySelectorAll('.person-summary').forEach(el => el.textContent = card.bio);
+      }
+
+      // Avatar
+      if (card.avatar_url) {
+        root.querySelectorAll('.avatar-img').forEach(el => {
+          el.src = card.avatar_url;
+          el.alt = card.full_name || 'Profile';
+        });
+      }
+
+      // Signature
+      const sigContainers = root.querySelectorAll('.signature-container');
+      if (card.signature_url) {
+        sigContainers.forEach(c => {
+          c.style.display = 'flex';
+          const img = c.querySelector('.signature-img');
+          if (img) {
+            img.src = card.signature_url;
+            img.alt = (card.full_name || '') + ' Signature';
+          }
+        });
+      } else {
+        sigContainers.forEach(c => c.style.display = 'none');
+      }
+
+      // 4 Executive Pillars (Front & Back)
+      const pillars = [
+        { title: card.pillar_1_title, desc: card.pillar_1_desc },
+        { title: card.pillar_2_title, desc: card.pillar_2_desc },
+        { title: card.pillar_3_title, desc: card.pillar_3_desc },
+        { title: card.pillar_4_title, desc: card.pillar_4_desc }
+      ];
+
+      // Front pillar cards
+      const pillarCards = root.querySelectorAll('.pillar-card');
+      pillarCards.forEach((pCard, idx) => {
+        if (pillars[idx]) {
+          const t = pCard.querySelector('.pillar-title');
+          const d = pCard.querySelector('.pillar-desc');
+          if (t && pillars[idx].title) t.textContent = pillars[idx].title;
+          if (d && pillars[idx].desc) d.textContent = pillars[idx].desc;
+        }
+      });
+
+      // Back capabilities
+      const capItems = root.querySelectorAll('.cap-item');
+      capItems.forEach((cItem, idx) => {
+        if (pillars[idx] && pillars[idx].title) {
+          const textEl = cItem.querySelector('.cap-text');
+          if (textEl) {
+            textEl.innerHTML = `<strong>${idx + 1}. ${pillars[idx].title}:</strong> ${pillars[idx].desc || ''}`;
+          }
+        }
+      });
+
+      // Front bottom contacts
+      root.querySelectorAll('.contact-item').forEach(item => {
+        const a = item.querySelector('a');
+        const span = item.querySelector('span');
+        if (a && a.href.startsWith('tel:')) {
+          if (card.phone) {
+            a.href = 'tel:' + card.phone.replace(/[^0-9+]/g, '');
+            a.textContent = card.phone;
+          }
+        } else if (a && a.href.startsWith('mailto:')) {
+          if (card.email) {
+            a.href = 'mailto:' + card.email;
+            a.textContent = card.email;
+          }
+        } else if (a && (a.href.startsWith('http') || a.classList.contains('contact-link'))) {
+          if (card.website) {
+            a.href = card.website;
+            a.textContent = card.website.replace(/^https?:\/\//, '').replace(/\/$/, '');
+          }
+        } else if (span && !a) {
+          if (card.location) span.textContent = card.location;
+        }
+      });
+
+      // Back links
+      root.querySelectorAll('.back-link').forEach(link => {
+        const span = link.querySelector('span');
+        if (link.href.startsWith('tel:')) {
+          if (card.phone) {
+            link.href = 'tel:' + card.phone.replace(/[^0-9+]/g, '');
+            if (span) span.textContent = card.phone;
+          }
+        } else if (link.href.startsWith('mailto:')) {
+          if (card.email) {
+            link.href = 'mailto:' + card.email;
+            if (span) span.textContent = card.email;
+          }
+        } else if (link.href.includes('linkedin.com')) {
+          if (card.linkedin_url) {
+            link.href = card.linkedin_url;
+            if (span) span.textContent = card.linkedin_url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+          }
+        } else if (link.href.startsWith('http')) {
+          if (card.website) {
+            link.href = card.website;
+            if (span) span.textContent = card.website.replace(/^https?:\/\//, '').replace(/\/$/, '');
+          }
+        }
+      });
+
+      // Template Action buttons (Email & Phone copy)
+      root.querySelectorAll('button').forEach(btn => {
+        const text = btn.textContent || '';
+        if (text.includes('Email') && card.email) {
+          btn.setAttribute('onclick', `event.stopPropagation(); copyText('${card.email}', 'Email copied to clipboard', this)`);
+        } else if (text.includes('Phone') && card.phone) {
+          btn.setAttribute('onclick', `event.stopPropagation(); copyText('${card.phone}', 'Phone copied to clipboard', this)`);
+        }
+      });
+    }
+
+    // Apply card data to templates, outer UI, and visible faces
+    function applyCardData(card) {
+      if (!card) return;
+      activeCard = card;
+
+      // Update browser tab title
+      if (card.full_name) {
+        document.title = `${card.full_name} | ${card.headline_title || card.company_name || 'Virtual Card'}`;
+      }
+
+      // Update meta tags
+      if (card.bio) {
+        const metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', card.bio);
+        const ogDesc = document.querySelector('meta[property="og:description"]');
+        if (ogDesc) ogDesc.setAttribute('content', card.bio);
+      }
+      if (card.full_name) {
+        const ogTitle = document.querySelector('meta[property="og:title"]');
+        if (ogTitle) ogTitle.setAttribute('content', `${card.full_name} | ${card.headline_title || card.company_name}`);
+        const twTitle = document.querySelector('meta[name="twitter:title"]');
+        if (twTitle) twTitle.setAttribute('content', `${card.full_name} | ${card.headline_title || card.company_name}`);
+      }
+
+      // Update outer Top Nav & Action Dock
+      hydrateContainer(document.querySelector('.top-nav'), card);
+      hydrateContainer(document.querySelector('.action-dock'), card);
+
+      // Hydrate all 3 templates
+      [1, 2, 3].forEach(id => {
+        const tmpl = document.getElementById(templates[id]);
+        if (tmpl) {
+          if (tmpl.content && tmpl.content.firstElementChild) {
+            hydrateContainer(tmpl.content, card);
+          }
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = tmpl.innerHTML;
+          hydrateContainer(tempDiv, card);
+          tmpl.innerHTML = tempDiv.innerHTML;
+        }
+      });
+
+      // Update visible and hidden faces
+      const visibleFace = document.getElementById('visibleFace');
+      const hiddenFace = document.getElementById('hiddenFace');
+      if (visibleFace && hiddenFace) {
+        visibleFace.innerHTML = document.getElementById(templates[currentSide]).innerHTML;
+        const maxSides = (window.innerWidth <= 1080) ? 3 : 2;
+        const nextSide = (currentSide >= maxSides) ? 1 : currentSide + 1;
+        hiddenFace.innerHTML = document.getElementById(templates[nextSide]).innerHTML;
+      }
+
+      // Update dynamic vCards and QR Code
+      updateVCard(card);
+      initQRCode();
+      checkIosPrompt();
+    }
+
+    // Fetch card record from Supabase
+    async function loadCardData() {
+      const slug = resolveCardSlug();
+      
+      try {
+        const response = await fetch(
+          `${SUPABASE_CONFIG.url}/rest/v1/cards?slug=eq.${encodeURIComponent(slug)}&is_published=eq.true&select=*`,
+          {
+            headers: {
+              'apikey': SUPABASE_CONFIG.anonKey,
+              'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`
+            }
+          }
+        );
+
+        if (response.ok) {
+          const cards = await response.json();
+          if (Array.isArray(cards) && cards.length > 0) {
+            applyCardData(cards[0]);
+            return;
+          }
+        }
+        
+        // If not found and slug is not default, notify user
+        if (slug !== 'ashish') {
+          showToast(`Card "${slug}" not found, showing default`);
+        }
+      } catch (err) {
+        console.warn('Supabase fetch error, fallback to static:', err);
+      }
+    }
+
     // State management
     let currentSide = 1; // 1: Front, 2: Back, 3: Actions
     let flipCount = 0;
@@ -1012,20 +1331,6 @@
       // Init QR code which is now in hiddenFace
       initQRCode();
       checkIosPrompt();
-    }
-
-    function initQRCode() {
-      const qrContainer = document.getElementById("qrcode");
-      if (qrContainer && qrContainer.childElementCount === 0) {
-        new QRCode(qrContainer, {
-          text: "https://ashishmarsani.com.np",
-          width: 172,
-          height: 172,
-          colorDark: "#0f172a",
-          colorLight: "#ffffff",
-          correctLevel: QRCode.CorrectLevel.H
-        });
-      }
     }
     
     function copyText(text, msg, btn) {
@@ -1186,7 +1491,10 @@
     }
 
     // Initialize on load
-    document.addEventListener('DOMContentLoaded', initCard);
+    document.addEventListener('DOMContentLoaded', () => {
+      initCard();
+      loadCardData();
+    });
 
     // Dynamic responsive card scaling and landscape orientation
     function updateCardScale() {
@@ -1302,15 +1610,15 @@
           <!-- Top Bar -->
           <div class="front-top">
             <div style="display: flex; align-items: center; gap: 14px;">
-              <div class="front-crest">AM</div>
+              <div class="front-crest card-crest">AM</div>
               <div style="display: flex; flex-direction: column;">
-                <div style="font-family: 'Outfit', sans-serif; font-size: 13.5px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #0f172a;">ARCHITECTURE & ADVISORY</div>
-                <div style="font-family: 'Outfit', sans-serif; font-size: 9.5px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #0284c7; margin-top: 1px;">ENTERPRISE CLOUD & AI SYSTEMS</div>
+                <div class="card-company-name" style="font-family: 'Outfit', sans-serif; font-size: 13.5px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #0f172a;">ARCHITECTURE & ADVISORY</div>
+                <div class="card-role-subtitle" style="font-family: 'Outfit', sans-serif; font-size: 9.5px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #0284c7; margin-top: 1px;">ENTERPRISE CLOUD & AI SYSTEMS</div>
               </div>
             </div>
             <div class="top-badge">
               <span class="top-badge-dot"></span>
-              <span>ENTERPRISE ARCHITECTURE & STRATEGIC ADVISORY</span>
+              <span class="card-badge-text">ENTERPRISE ARCHITECTURE & STRATEGIC ADVISORY</span>
             </div>
           </div>
 
@@ -1425,7 +1733,7 @@
           <!-- Right Content Panel -->
           <div class="back-content">
             <div class="back-header">
-              <div class="front-crest">AM</div>
+              <div class="front-crest card-crest">AM</div>
               <div style="display: flex; flex-direction: column;">
                 <div class="back-title">Ashish Marsani</div>
                 <div class="back-sub">Principal System Architect & Enterprise Advisor</div>
@@ -1489,7 +1797,7 @@
 <template id="template-actions">
   <div class="front-layout" style="align-items: center; justify-content: center; height: 100%; display: flex; flex-direction: column; gap: 16px;">
     <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 4px;">
-      <div class="front-crest">AM</div>
+      <div class="front-crest card-crest">AM</div>
       <div style="display: flex; flex-direction: column;">
         <div style="font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #0f172a;">QUICK ACTIONS</div>
         <div style="font-family: 'Outfit', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #0284c7; margin-top: 1px;">CONNECT & SAVE CONTACT</div>
