@@ -1,0 +1,9 @@
+# Security Policy & Vulnerability Disclosure
+# RFC 9116 compliant security.txt for ashishmarsani.com.np
+
+Contact: mailto:ashish.marsani@gmail.com
+Expires: 2027-09-05T00:00:00.000Z
+Preferred-Languages: en, ne
+Canonical: https://ashishmarsani.com.np/.well-known/security.txt
+Policy: https://ashishmarsani.com.np
+Hiring: https://linkedin.com/in/ashishmarsani
