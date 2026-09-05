@@ -723,30 +723,7 @@
       flex-shrink: 0;
     }
 
-    /* Flip Hint */
-    .flip-hint {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 16px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-light);
-      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s ease;
-    }
 
-    .flip-hint.faded {
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(4px);
-    }
-
-    .flip-hint svg {
-      width: 16px;
-      height: 16px;
-      fill: currentColor;
-    }
 
     /* Floating Action Dock */
     .action-dock {
@@ -879,18 +856,12 @@
         justify-content: flex-start !important;
       }
       .top-nav,
-      .action-dock,
-      .flip-hint {
+      .action-dock {
         display: none !important;
       }
       .card-stage {
         margin: 0 !important;
       }
-    }
-
-    /* Landscape mode adjustments for mobile */
-    body.rotate-90 .flip-hint {
-      margin-top: 14px;
     }
   </style>
 </head>
@@ -936,12 +907,6 @@
       </div> <!-- end flipper -->
     </div> <!-- end cardScene -->
   </div> <!-- end cardStage -->
-
-  <!-- Flip Instruction -->
-  <div class="flip-hint">
-    <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
-    <span>Tap card to flip</span>
-  </div>
 
   <!-- Action Buttons -->
   <div class="action-dock">
@@ -1075,12 +1040,6 @@
       // Haptic feedback on supported mobile devices
       if (navigator.vibrate) {
         navigator.vibrate(40);
-      }
-
-      // Fade out the initial flip instruction hint
-      const hint = document.querySelector('.flip-hint');
-      if (hint) {
-        hint.classList.add('faded');
       }
 
       flipCount++;
