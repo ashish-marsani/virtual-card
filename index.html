@@ -1068,49 +1068,31 @@
 
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
+      const isLandscapeOrientation = window.matchMedia("(orientation: landscape)").matches;
+      const isRotatedLandscape = document.body.classList.contains('rotate-90');
 
       if (viewportWidth > 1080) {
         stage.style.width = '1050px';
         stage.style.height = '600px';
-        scene.style.position = 'relative';
-        scene.style.top = '0';
-        scene.style.left = '0';
-        scene.style.width = '100%';
-        scene.style.height = '100%';
-        scene.style.transform = 'none';
+        scene.style.transform = 'scale(1)';
         return;
       }
 
       // Mobile Mode (<= 1080px)
       const isPortrait = viewportHeight > viewportWidth;
-      const margin = 32; // Total margin for breathing room
 
       if (isPortrait) {
-        const scale = Math.min(
-          (viewportHeight - margin - 60) / 1050, // leave some room for the flip hint
-          (viewportWidth - margin) / 600
-        );
+        // Autorotate mode on mobile (portrait): Rotated 90 degrees to fill screen height
+        const scale = viewportHeight / 1050;
         stage.style.width = Math.round(600 * scale) + 'px';
         stage.style.height = Math.round(1050 * scale) + 'px';
-        scene.style.position = 'absolute';
-        scene.style.top = '50%';
-        scene.style.left = '50%';
-        scene.style.width = '1050px';
-        scene.style.height = '600px';
-        scene.style.transform = `translate(-50%, -50%) rotate(90deg) scale(${scale})`;
+        scene.style.transform = `rotate(90deg) scale(${scale})`;
       } else {
-        const scale = Math.min(
-          (viewportWidth - margin) / 1050,
-          (viewportHeight - margin - 40) / 600
-        );
+        // Normal mode on mobile (landscape): fill screen width
+        const scale = viewportWidth / 1050;
         stage.style.width = Math.round(1050 * scale) + 'px';
         stage.style.height = Math.round(600 * scale) + 'px';
-        scene.style.position = 'absolute';
-        scene.style.top = '50%';
-        scene.style.left = '50%';
-        scene.style.width = '1050px';
-        scene.style.height = '600px';
-        scene.style.transform = `translate(-50%, -50%) scale(${scale})`;
+        scene.style.transform = `scale(${scale})`;
       }
     }
 
