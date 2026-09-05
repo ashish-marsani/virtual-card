@@ -1230,30 +1230,27 @@
       sessionStorage.setItem('inAppNoticeDismissed', 'true');
     }
 
-    // Manual rotation state for mobile: 90 (left), -90 (right), 0 (horizontal)
+    // Manual rotation state for mobile: 90 (landscape-left) vs -90 (landscape-right)
     let currentManualAngle = 90;
 
     function rotateCardManual(event) {
       if (event) event.stopPropagation();
 
-      // Cycle: 90° (Landscape-Left) -> -90° (Landscape-Right) -> 0° (Horizontal) -> 90°
+      // Strictly toggle between Landscape-Left (90°) and Landscape-Right (-90°)
       if (currentManualAngle === 90) {
         currentManualAngle = -90;
-        showToast('Rotated (Landscape-Right)');
-      } else if (currentManualAngle === -90) {
-        currentManualAngle = 0;
-        showToast('Rotated (Horizontal View)');
+        showToast('Flipped: Landscape-Right');
       } else {
         currentManualAngle = 90;
-        showToast('Rotated (Landscape-Left)');
+        showToast('Flipped: Landscape-Left');
       }
 
-      // Rotate icon feedback
+      // Rotate icon feedback (180deg flip)
       const btn = document.querySelector('.mobile-rotate-btn');
       if (btn) {
         const svg = btn.querySelector('svg');
         if (svg) {
-          svg.style.transform = `rotate(${currentManualAngle === 0 ? 0 : currentManualAngle}deg)`;
+          svg.style.transform = `rotate(${currentManualAngle === 90 ? 0 : 180}deg)`;
         }
       }
 
@@ -1308,25 +1305,16 @@
         // Auto-adopt physical landscape angle if reported by system
         if (orientAngle === -90 || orientAngle === 270 || (screen.orientation && screen.orientation.type === 'landscape-secondary')) {
           angle = -90;
+          currentManualAngle = -90;
         } else if (orientAngle === 90 || (screen.orientation && screen.orientation.type === 'landscape-primary')) {
           angle = 90;
+          currentManualAngle = 90;
         }
 
-        let scaleW, scaleH;
-        if (angle === 0) {
-          scaleW = viewportWidth / 1050;
-          scaleH = viewportHeight / 600;
-        } else {
-          scaleW = viewportWidth / 600;
-          scaleH = viewportHeight / 1050;
-        }
-
+        const scaleW = viewportWidth / 600;
+        const scaleH = viewportHeight / 1050;
         const scale = Math.min(scaleW, scaleH) * 0.92;
-        if (angle === 0) {
-          scene.style.transform = `scale(${scale})`;
-        } else {
-          scene.style.transform = `rotate(${angle}deg) scale(${scale})`;
-        }
+        scene.style.transform = `rotate(${angle}deg) scale(${scale})`;
       }
     }
 
