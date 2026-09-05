@@ -1113,41 +1113,44 @@
       stage.style.width = viewportWidth + 'px';
       stage.style.height = viewportHeight + 'px';
 
-      // Detect orientation using multiple signals for maximum reliability
-      // screen.orientation works on Android + modern iOS; fallback to viewport ratio
-      let isPortrait = viewportHeight > viewportWidth;
+      // Check all landscape signals
+      const isRatioLandscape = viewportWidth > viewportHeight;
+      const isMQLandscape = window.matchMedia && window.matchMedia('(orientation: landscape)').matches;
+      const winOrient = typeof window.orientation !== 'undefined' ? window.orientation : null;
+      const isWinLandscape = (winOrient === 90 || winOrient === -90 || winOrient === 270);
+      const isScreenLandscape = screen.orientation && screen.orientation.type && screen.orientation.type.startsWith('landscape');
 
-      // Double-check with screen.orientation API if available (handles edge cases)
-      if (screen.orientation && screen.orientation.type) {
-        const orientationType = screen.orientation.type;
-        if (orientationType.startsWith('landscape')) {
-          isPortrait = false;
-        } else if (orientationType.startsWith('portrait')) {
-          isPortrait = true;
-        }
-      }
+      // If ANY robust landscape signal is true, it is landscape!
+      const isLandscape = isRatioLandscape || isMQLandscape || isWinLandscape || isScreenLandscape;
 
-      if (isPortrait) {
-        // Portrait: card auto-rotates to landscape orientation
-        // Card is 1050×600, rotated 90° → needs 600px width, 1050px height
-        const scaleW = viewportWidth / 600;
-        const scaleH = viewportHeight / 1050;
-        const scale = Math.min(scaleW, scaleH) * 0.92;
-        scene.style.transform = `rotate(90deg) scale(${scale})`;
-      } else {
-        // Landscape (either direction): card sits naturally, no rotation needed
+      if (isLandscape) {
+        // Landscape (either landscape-left or landscape-right):
+        // Card displays naturally, no 90° rotation needed
         const scaleW = viewportWidth / 1050;
         const scaleH = viewportHeight / 600;
         const scale = Math.min(scaleW, scaleH) * 0.92;
         scene.style.transform = `scale(${scale})`;
+      } else {
+        // Portrait: card auto-rotates to fit phone screen horizontally
+        const scaleW = viewportWidth / 600;
+        const scaleH = viewportHeight / 1050;
+        const scale = Math.min(scaleW, scaleH) * 0.92;
+
+        // If physically held in landscape-right (-90° / 270°) but browser viewport stayed in portrait
+        if (winOrient === -90 || winOrient === 270 || (screen.orientation && screen.orientation.type === 'landscape-secondary')) {
+          scene.style.transform = `rotate(-90deg) scale(${scale})`;
+        } else {
+          scene.style.transform = `rotate(90deg) scale(${scale})`;
+        }
       }
     }
 
     // Staggered retries after orientation change to handle iOS viewport settle delay
     function handleOrientationChange() {
       updateCardScale();
-      setTimeout(updateCardScale, 150);
-      setTimeout(updateCardScale, 400);
+      setTimeout(updateCardScale, 80);
+      setTimeout(updateCardScale, 200);
+      setTimeout(updateCardScale, 450);
       setTimeout(updateCardScale, 800);
     }
 
@@ -1155,14 +1158,20 @@
     window.addEventListener('resize', updateCardScale);
     window.addEventListener('orientationchange', handleOrientationChange);
 
-    // Modern screen.orientation API (fires for landscape-primary AND landscape-secondary)
-    if (screen.orientation) {
+    // Modern screen.orientation API
+    if (screen.orientation && screen.orientation.addEventListener) {
       screen.orientation.addEventListener('change', handleOrientationChange);
     }
 
-    // MediaQuery listener as additional fallback (catches all orientation changes)
-    const portraitMQ = window.matchMedia('(orientation: portrait)');
-    portraitMQ.addEventListener('change', handleOrientationChange);
+    // MediaQuery listener (compatible with addEventListener and legacy addListener)
+    try {
+      const landscapeMQ = window.matchMedia('(orientation: landscape)');
+      if (landscapeMQ.addEventListener) {
+        landscapeMQ.addEventListener('change', handleOrientationChange);
+      } else if (landscapeMQ.addListener) {
+        landscapeMQ.addListener(handleOrientationChange);
+      }
+    } catch (e) {}
 
     document.addEventListener('DOMContentLoaded', () => {
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
