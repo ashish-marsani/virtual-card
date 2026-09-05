@@ -855,10 +855,6 @@
       display: none;
     }
 
-    .in-app-banner {
-      display: none;
-    }
-
     /* Responsive scaling & landscape presentation for mobile devices */
     @media (max-width: 1080px) {
       body {
@@ -920,63 +916,10 @@
       .mobile-rotate-btn svg {
         transition: transform 0.4s cubic-bezier(0.34, 1.25, 0.64, 1);
       }
-
-      .in-app-banner {
-        display: none;
-        position: fixed;
-        top: 12px;
-        left: 14px;
-        right: 14px;
-        z-index: 9999;
-        background: rgba(15, 23, 42, 0.92);
-        backdrop-filter: blur(14px);
-        -webkit-backdrop-filter: blur(14px);
-        color: #f8fafc;
-        padding: 9px 12px;
-        border-radius: 12px;
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 11.5px;
-        line-height: 1.4;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.35);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        align-items: center;
-        justify-content: space-between;
-        gap: 8px;
-        animation: fadeInDown 0.4s ease;
-      }
-      .in-app-banner-content {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-      .in-app-banner-icon {
-        font-size: 15px;
-        flex-shrink: 0;
-      }
-      .in-app-banner-close {
-        background: transparent;
-        border: none;
-        color: rgba(255, 255, 255, 0.6);
-        font-size: 16px;
-        cursor: pointer;
-        padding: 4px;
-        display: flex;
-        align-items: center;
-        flex-shrink: 0;
-      }
     }
   </style>
 </head>
 <body>
-
-  <!-- In-App Browser Tip (Messenger / Instagram / etc.) -->
-  <div id="inAppBanner" class="in-app-banner">
-    <div class="in-app-banner-content">
-      <span class="in-app-banner-icon">💡</span>
-      <span><strong>In-App Browser:</strong> Tap <strong>•••</strong> and choose <strong>"Open in Safari"</strong> for full auto-rotation & saving contact.</span>
-    </div>
-    <button class="in-app-banner-close" onclick="dismissInAppBanner()" aria-label="Close">✕</button>
-  </div>
 
   <!-- Floating Mobile Controls -->
   <div class="mobile-controls">
@@ -1215,21 +1158,6 @@
       }
     }
 
-    // In-app browser detection (Messenger, Instagram, etc.)
-    function checkInAppBrowser() {
-      const isInApp = /FBAN|FBAV|Instagram|Line|Twitter|MicroMessenger|Snapchat|LinkedIn/i.test(navigator.userAgent);
-      if (isInApp && !sessionStorage.getItem('inAppNoticeDismissed')) {
-        const banner = document.getElementById('inAppBanner');
-        if (banner) banner.style.display = 'flex';
-      }
-    }
-
-    function dismissInAppBanner() {
-      const banner = document.getElementById('inAppBanner');
-      if (banner) banner.style.display = 'none';
-      sessionStorage.setItem('inAppNoticeDismissed', 'true');
-    }
-
     // Manual rotation state for mobile: 90 (landscape-left) vs -90 (landscape-right)
     let currentManualAngle = 90;
 
@@ -1354,7 +1282,6 @@
         iosPrompt.style.display = 'flex';
       }
       
-      checkInAppBrowser();
       updateCardScale();
     });
     setTimeout(updateCardScale, 200);
