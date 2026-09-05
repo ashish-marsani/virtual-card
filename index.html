@@ -850,6 +850,15 @@
       justify-content: center;
     }
 
+    /* Floating mobile controls */
+    .mobile-controls {
+      display: none;
+    }
+
+    .in-app-banner {
+      display: none;
+    }
+
     /* Responsive scaling & landscape presentation for mobile devices */
     @media (max-width: 1080px) {
       body {
@@ -873,10 +882,111 @@
         margin: 0 !important;
         z-index: 10;
       }
+
+      .mobile-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        position: fixed;
+        bottom: 22px;
+        right: 18px;
+        z-index: 100;
+      }
+
+      .mobile-rotate-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1.5px solid rgba(2, 132, 199, 0.35);
+        color: #0369a1;
+        font-family: 'Outfit', sans-serif;
+        font-size: 12.5px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        padding: 8px 14px;
+        border-radius: 9999px;
+        box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.18), 0 2px 6px rgba(2, 132, 199, 0.12);
+        cursor: pointer;
+        user-select: none;
+        transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s, box-shadow 0.2s;
+      }
+      .mobile-rotate-btn:active {
+        transform: scale(0.93);
+        background: rgba(240, 249, 255, 0.95);
+      }
+      .mobile-rotate-btn svg {
+        transition: transform 0.4s cubic-bezier(0.34, 1.25, 0.64, 1);
+      }
+
+      .in-app-banner {
+        display: none;
+        position: fixed;
+        top: 12px;
+        left: 14px;
+        right: 14px;
+        z-index: 9999;
+        background: rgba(15, 23, 42, 0.92);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        color: #f8fafc;
+        padding: 9px 12px;
+        border-radius: 12px;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 11.5px;
+        line-height: 1.4;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.35);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        animation: fadeInDown 0.4s ease;
+      }
+      .in-app-banner-content {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .in-app-banner-icon {
+        font-size: 15px;
+        flex-shrink: 0;
+      }
+      .in-app-banner-close {
+        background: transparent;
+        border: none;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 16px;
+        cursor: pointer;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+      }
     }
   </style>
 </head>
 <body>
+
+  <!-- In-App Browser Tip (Messenger / Instagram / etc.) -->
+  <div id="inAppBanner" class="in-app-banner">
+    <div class="in-app-banner-content">
+      <span class="in-app-banner-icon">💡</span>
+      <span><strong>In-App Browser:</strong> Tap <strong>•••</strong> and choose <strong>"Open in Safari"</strong> for full auto-rotation & saving contact.</span>
+    </div>
+    <button class="in-app-banner-close" onclick="dismissInAppBanner()" aria-label="Close">✕</button>
+  </div>
+
+  <!-- Floating Mobile Controls -->
+  <div class="mobile-controls">
+    <button class="mobile-rotate-btn" onclick="rotateCardManual(event)" aria-label="Rotate Card">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+      </svg>
+      <span>Rotate</span>
+    </button>
+  </div>
 
   <!-- Toast -->
   <div id="toast" class="toast">
@@ -1092,6 +1202,64 @@
       }
     }
 
+    // Global Toast Notification Helper
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-msg');
+      if (toast && toastMsg) {
+        toastMsg.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 2200);
+      }
+    }
+
+    // In-app browser detection (Messenger, Instagram, etc.)
+    function checkInAppBrowser() {
+      const isInApp = /FBAN|FBAV|Instagram|Line|Twitter|MicroMessenger|Snapchat|LinkedIn/i.test(navigator.userAgent);
+      if (isInApp && !sessionStorage.getItem('inAppNoticeDismissed')) {
+        const banner = document.getElementById('inAppBanner');
+        if (banner) banner.style.display = 'flex';
+      }
+    }
+
+    function dismissInAppBanner() {
+      const banner = document.getElementById('inAppBanner');
+      if (banner) banner.style.display = 'none';
+      sessionStorage.setItem('inAppNoticeDismissed', 'true');
+    }
+
+    // Manual rotation state for mobile: 90 (left), -90 (right), 0 (horizontal)
+    let currentManualAngle = 90;
+
+    function rotateCardManual(event) {
+      if (event) event.stopPropagation();
+
+      // Cycle: 90° (Landscape-Left) -> -90° (Landscape-Right) -> 0° (Horizontal) -> 90°
+      if (currentManualAngle === 90) {
+        currentManualAngle = -90;
+        showToast('Rotated (Landscape-Right)');
+      } else if (currentManualAngle === -90) {
+        currentManualAngle = 0;
+        showToast('Rotated (Horizontal View)');
+      } else {
+        currentManualAngle = 90;
+        showToast('Rotated (Landscape-Left)');
+      }
+
+      // Rotate icon feedback
+      const btn = document.querySelector('.mobile-rotate-btn');
+      if (btn) {
+        const svg = btn.querySelector('svg');
+        if (svg) {
+          svg.style.transform = `rotate(${currentManualAngle === 0 ? 0 : currentManualAngle}deg)`;
+        }
+      }
+
+      updateCardScale();
+    }
+
     // Initialize on load
     document.addEventListener('DOMContentLoaded', initCard);
 
@@ -1124,7 +1292,7 @@
         orientAngle = Number(screen.orientation.angle);
       }
 
-      // Check if browser viewport is in landscape (width > height)
+      // Check if browser viewport has rotated into landscape (width > height)
       const isViewportLandscape = (viewportWidth > viewportHeight) || (window.matchMedia && window.matchMedia('(orientation: landscape)').matches);
 
       if (isViewportLandscape) {
@@ -1135,17 +1303,29 @@
         scene.style.transform = `scale(${scale})`;
       } else {
         // Browser viewport is in portrait (viewportHeight >= viewportWidth)
-        // Card is scaled to fit phone screen
-        const scaleW = viewportWidth / 600;
-        const scaleH = viewportHeight / 1050;
-        const scale = Math.min(scaleW, scaleH) * 0.92;
+        let angle = currentManualAngle;
 
-        // When tilted to landscape-right (-90° / 270°), rotate -90° so it stays right-side up!
+        // Auto-adopt physical landscape angle if reported by system
         if (orientAngle === -90 || orientAngle === 270 || (screen.orientation && screen.orientation.type === 'landscape-secondary')) {
-          scene.style.transform = `rotate(-90deg) scale(${scale})`;
+          angle = -90;
+        } else if (orientAngle === 90 || (screen.orientation && screen.orientation.type === 'landscape-primary')) {
+          angle = 90;
+        }
+
+        let scaleW, scaleH;
+        if (angle === 0) {
+          scaleW = viewportWidth / 1050;
+          scaleH = viewportHeight / 600;
         } else {
-          // Normal portrait (0°) or landscape-left (90°)
-          scene.style.transform = `rotate(90deg) scale(${scale})`;
+          scaleW = viewportWidth / 600;
+          scaleH = viewportHeight / 1050;
+        }
+
+        const scale = Math.min(scaleW, scaleH) * 0.92;
+        if (angle === 0) {
+          scene.style.transform = `scale(${scale})`;
+        } else {
+          scene.style.transform = `rotate(${angle}deg) scale(${scale})`;
         }
       }
     }
@@ -1181,10 +1361,12 @@
     document.addEventListener('DOMContentLoaded', () => {
       const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
       const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-      if (isIOS && !isStandalone) {
-        document.getElementById('iosPrompt').style.display = 'flex';
+      const iosPrompt = document.getElementById('iosPrompt');
+      if (isIOS && !isStandalone && iosPrompt) {
+        iosPrompt.style.display = 'flex';
       }
       
+      checkInAppBrowser();
       updateCardScale();
     });
     setTimeout(updateCardScale, 200);
