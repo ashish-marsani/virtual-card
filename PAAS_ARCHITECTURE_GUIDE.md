@@ -167,3 +167,26 @@ As you expand into **Google Firebase**, here is how it compares directly with yo
 2. **Adding Customer Cards:** Open Supabase Dashboard → `cards` table → click `Insert row` → populate fields → Save.
 3. **Updating Assets:** Store optimized images (e.g. `ashish_profile.jpg`) directly in the Git repository for instant CDN delivery.
 4. **Verifying Keep-Alive:** Check [GitHub Actions](https://github.com/ashish-marsani/virtual-card/actions) to review the 48-hour automated heartbeat log.
+
+---
+
+## 6. Underlying Operating Systems & Virtualization Architecture
+
+Understanding the host OS, virtualization layer, and container architecture of each platform ensures you know exactly how binaries compile, execute, and scale under the hood:
+
+| Platform | Host Operating System | Virtualization / Isolation Layer | Hardware Architecture | Cloud Infrastructure |
+| :--- | :--- | :--- | :--- | :--- |
+| **GitHub Actions** | **Ubuntu Linux** (`ubuntu-latest` = 22.04 / 24.04 LTS)<br>*(Also supports macOS & Windows)* | Microsoft Hyper-V Virtual Machines (Dedicated Standard_DS2_v2 runners) | `x86_64` (AMD64) / `arm64` for macOS runners | Microsoft Azure |
+| **Vercel** | **Amazon Linux 2 / Amazon Linux 2023** (Enterprise RPM-based Linux) | **AWS Firecracker MicroVMs** (for Serverless Functions) & **V8 Isolates** (for Edge) | `x86_64` & `arm64` (Graviton) | AWS (Lambda & CloudFront) + Vercel Edge |
+| **Render** | **Ubuntu Linux** (22.04 LTS base container image) | **Kubernetes (K8s)** multi-tenant container pods with Docker isolation | `x86_64` (AMD64) | AWS & GCP (Global regions) |
+| **Supabase** | **Ubuntu / Debian Linux** (Debian 12 Bookworm base in containers) | **Dedicated KVM / Nitro Virtual Machines** on AWS EC2 | `x86_64` & `arm64` (Graviton) | AWS (Our instance: `ap-southeast-1` Singapore) |
+| **Google Firebase** | **Google gLinux** (Debian-derived production Linux) | **Borg Containers** & **gVisor Sandboxed Micro-kernels** (for Cloud Functions) | `x86_64` (AMD64) | Google Cloud Platform (GCP) |
+| **Cloudflare** | **Custom Minimal Linux** (Tailored kernel with eBPF optimizations) | **V8 Isolates** (No OS container overhead; direct memory-sandboxed threads) | `x86_64` & `arm64` bare-metal edge servers | Cloudflare Global Network (300+ cities) |
+
+### Key Architectural Takeaways:
+
+1. **Linux Dominance**: Every single platform in this cloud stack runs **Linux** at its foundation. Even when deploying from a macOS workstation, the code builds, tests, and serves inside Linux environments.
+2. **MicroVMs vs. Isolates**:
+   * Traditional PaaS (like Render and AWS Lambda/Vercel functions) spin up **microVMs or container namespaces** running a full Linux userspace.
+   * Modern edge architectures (like Cloudflare Workers and Vercel Edge) bypass traditional operating systems altogether using **V8 Isolates**—running code directly inside memory-protected execution threads with **sub-millisecond boot times**.
+
