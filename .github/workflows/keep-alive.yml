@@ -1,0 +1,25 @@
+name: Keep Supabase Awake
+
+on:
+  schedule:
+    # Runs every 2 days at 04:00 UTC (well within the 7-day inactivity window)
+    - cron: '0 4 */2 * *'
+  workflow_dispatch: # Allows manual testing from the GitHub Actions dashboard
+
+jobs:
+  ping-supabase:
+    name: Heartbeat Ping
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send API Heartbeat to Supabase
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZydmpudmZodWlpd2xxc2hsd252Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2Mzk4NTcsImV4cCI6MjEwNDIxNTg1N30.-kMNN3_7qBX69nPaPOpFqKbdcA8YZrQhvVsOgYtM6Nc" \
+            -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZydmpudmZodWlpd2xxc2hsd252Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2Mzk4NTcsImV4cCI6MjEwNDIxNTg1N30.-kMNN3_7qBX69nPaPOpFqKbdcA8YZrQhvVsOgYtM6Nc" \
+            "https://frvjnvfhuiiwlqshlwnv.supabase.co/rest/v1/cards?select=id&limit=1")
+          echo "Supabase Response HTTP Code: $STATUS"
+          if [ "$STATUS" -ne 200 ]; then
+            echo "Warning: Received unexpected HTTP status $STATUS"
+            exit 1
+          fi
+          echo "Success: Supabase heartbeat acknowledged. Inactivity timer reset."
